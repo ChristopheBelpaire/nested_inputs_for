@@ -1,6 +1,7 @@
 defmodule NestedInputsForWeb.ProductForm do
   use Phoenix.LiveView
   alias NestedInputsFor.Product.{Attribute, Language, Product}
+  alias NestedInputsFor.Repo
   import NestedInputsForWeb.CoreComponents
 
   def render(assigns) do
@@ -31,16 +32,20 @@ defmodule NestedInputsForWeb.ProductForm do
   end
 
   def mount(_params, _, socket) do
-    changeset =
-      Product.changeset(
-        %Product{
-          languages: [
-            %Language{name: "FR", attributes: []},
-            %Language{name: "EN", attributes: []}
-          ]
-        },
-        %{}
-      )
+    changeset = Repo.all(Product)
+    |> Repo.preload(languages: :attributes)
+    |> hd()
+    |> Product.changeset(%{})
+
+      # Product.changeset(
+      #   %Product{
+      #     languages: [
+      #       %Language{name: "FR", attributes: []},
+      #       %Language{name: "EN", attributes: []}
+      #     ]
+      #   },
+      #   %{}
+      # )
 
     {:ok, assign(socket, %{form: to_form(changeset), changeset: changeset})}
   end
@@ -54,7 +59,6 @@ defmodule NestedInputsForWeb.ProductForm do
       end)
 
     changeset = Ecto.Changeset.put_assoc(changeset, :languages, udpated_languages)
-    IO.inspect(changeset)
     {:noreply, assign(socket, %{form: to_form(changeset), changeset: changeset})}
   end
 
