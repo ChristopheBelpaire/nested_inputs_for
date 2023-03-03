@@ -25,8 +25,8 @@ defmodule NestedInputsForWeb.ProductForm do
           </div>
         </.inputs_for>
       </div>
-      <div phx-click="add_attribute">Add attribute</div>
-      <button>Save</button>
+      <button type="button" class="btn-blue" phx-click="add_attribute">Add attribute</button>
+      <button class="btn-blue">Save</button>
     </.form>
     """
   end
@@ -37,15 +37,15 @@ defmodule NestedInputsForWeb.ProductForm do
     |> hd()
     |> Product.changeset(%{})
 
-      # Product.changeset(
-      #   %Product{
-      #     languages: [
-      #       %Language{name: "FR", attributes: []},
-      #       %Language{name: "EN", attributes: []}
-      #     ]
-      #   },
-      #   %{}
-      # )
+      Product.changeset(
+        %Product{
+          languages: [
+            %Language{name: "FR", attributes: []},
+            %Language{name: "EN", attributes: []}
+          ]
+        },
+        %{}
+      )
 
     {:ok, assign(socket, %{form: to_form(changeset), changeset: changeset})}
   end
@@ -55,10 +55,11 @@ defmodule NestedInputsForWeb.ProductForm do
     udpated_languages =
       Ecto.Changeset.get_field(changeset, :languages)
       |> Enum.map(fn language ->
-        Map.put(language, :attributes,  language.attributes ++ [%Attribute{}])
+        Ecto.Changeset.change(language)
+        |> Ecto.Changeset.put_assoc(:attributes, language.attributes ++ [%Attribute{}])
       end)
-
     changeset = Ecto.Changeset.put_assoc(changeset, :languages, udpated_languages)
+    |> IO.inspect()
     {:noreply, assign(socket, %{form: to_form(changeset), changeset: changeset})}
   end
 
