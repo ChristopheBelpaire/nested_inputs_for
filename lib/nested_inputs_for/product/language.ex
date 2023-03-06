@@ -6,7 +6,7 @@ defmodule NestedInputsFor.Product.Language do
   schema "languages" do
     field :name, :string
     belongs_to :product, Product
-    has_many :attributes, Attribute
+    has_many :attributes, Attribute, on_replace: :delete
     timestamps()
   end
 
