@@ -73,7 +73,7 @@ defmodule Main do
     selected_language = "FR"
 
     udpated_languages =
-      Ecto.Changeset.get_change(changeset, :languages)
+      Ecto.Changeset.get_assoc(changeset, :languages)
       |> Enum.map(fn language ->
         if(Ecto.Changeset.get_field(language, :name) == selected_language) do
           attributes = Ecto.Changeset.get_field(language, :attributes)

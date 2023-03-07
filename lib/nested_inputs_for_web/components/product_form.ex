@@ -2,7 +2,7 @@ defmodule NestedInputsForWeb.ProductForm do
   use Phoenix.LiveView
   alias NestedInputsFor.Product.{Attribute, Product}
   import NestedInputsForWeb.CoreComponents
-
+  alias Ecto.Changeset
   @spec render(any) :: Phoenix.LiveView.Rendered.t()
   def render(assigns) do
     ~H"""
@@ -56,8 +56,8 @@ defmodule NestedInputsForWeb.ProductForm do
       NestedInputsFor.Repo.all(Product)
         |> NestedInputsFor.Repo.preload(languages: :attributes)
         |> hd()
-        |> Ecto.Changeset.change()
-    #
+        |> Changeset.change()
+
     {:ok, assign(socket, %{form: to_form(changeset), changeset: changeset})}
   end
 
@@ -65,11 +65,11 @@ defmodule NestedInputsForWeb.ProductForm do
     changeset = socket.assigns.changeset
 
     udpated_languages =
-      Ecto.Changeset.get_field(changeset, :languages)
+      Changeset.get_assoc(changeset, :languages)
       |> Enum.map(fn language ->
-        if(language.name == clicked_language) do
-          Ecto.Changeset.change(language)
-          |> Ecto.Changeset.put_assoc(:attributes, language.attributes ++ [%Attribute{}])
+        if(Changeset.get_field(language, :name) == clicked_language) do
+          attributes = Ecto.Changeset.get_field(language, :attributes)
+          Ecto.Changeset.put_assoc(language, :attributes, attributes ++ [%Attribute{}])
         else
           Ecto.Changeset.change(language)
         end
@@ -90,7 +90,7 @@ defmodule NestedInputsForWeb.ProductForm do
     udpated_languages =
       Ecto.Changeset.get_assoc(changeset, :languages)
       |> Enum.map(fn language ->
-        if(Ecto.Changeset.get_field(language, :name) == clicked_language) do
+        if(Changeset.get_field(language, :name) == clicked_language) do
           attributes = Ecto.Changeset.get_field(language, :attributes)
           Ecto.Changeset.put_assoc(language, :attributes, List.delete_at(attributes, index))
         else
