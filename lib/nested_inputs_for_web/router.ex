@@ -17,6 +17,7 @@ defmodule NestedInputsForWeb.Router do
   scope "/", NestedInputsForWeb do
     pipe_through :browser
     live "/", ProductForm
+    live "/l", LanguageForm
   end
 
   # Other scopes may use custom stacks.

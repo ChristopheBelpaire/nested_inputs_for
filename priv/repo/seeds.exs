@@ -10,7 +10,6 @@
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
 
-
 alias NestedInputsFor.Repo
 
 alias NestedInputsFor.Product.{Product, Language, Attribute}
@@ -18,16 +17,13 @@ alias NestedInputsFor.Product.{Product, Language, Attribute}
 Repo.insert!(%Product{
   name: "a product",
   languages: [
-      %Language{name: "French",
+    %Language{
+      name: "French",
       attributes: [
-        %Attribute{label: "Couleur",
-        value: "Noir"}
+        %Attribute{label: "1", value: "Un"},
+        %Attribute{label: "2", value: "Deux"},
+        %Attribute{label: "3", value: "Trois"}
       ]
-    },
-    %Language{name: "English",
-    attributes: [
-      %Attribute{label: "Color",
-      value: "Black"}
-    ]
-  }]
+    }
+  ]
 })

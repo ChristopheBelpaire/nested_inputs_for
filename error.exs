@@ -1,4 +1,4 @@
-Mix.install([:ecto])
+Mix.install([{:ecto, git: "https://github.com/elixir-ecto/ecto.git", branch: "master"}])
 
 defmodule Product do
   use Ecto.Schema
@@ -35,7 +35,6 @@ defmodule Language do
   end
 end
 
-
 defmodule Attribute do
   use Ecto.Schema
   import Ecto.Changeset
@@ -53,52 +52,64 @@ defmodule Attribute do
   end
 end
 
-
 defmodule Main do
   def error() do
-    changeset = Product.changeset(%Product{},%{
-      "languages" => %{
-        "0" => %{
-          "attributes" => %{
-            "0" => %{"label" => "", "value" => ""},
-            "1" => %{"label" => "", "value" => "k"}
+    changeset =
+      Product.changeset(%Product{}, %{
+        "languages" => %{
+          "0" => %{
+            "attributes" => %{
+              "0" => %{"label" => "", "value" => ""},
+              "1" => %{"label" => "", "value" => "k"}
+            },
+            "name" => "FR"
           },
-          "name" => "FR"
+          "1" => %{"name" => "EN"}
         },
-        "1" => %{"name" => "EN"}
-      },
-      "name" => ""
-    })
+        "name" => ""
+      })
 
     index = 1
     selected_language = "FR"
-    udpated_languages = Ecto.Changeset.get_field(changeset, :languages) |> Enum.map(fn language ->
-      if(language.name == selected_language) do
-        Ecto.Changeset.change(language)
-        |> Ecto.Changeset.put_assoc(:attributes,
-           List.delete_at(language.attributes, index)
-        )
-      else
-        Ecto.Changeset.change(language)
-      end
-    end)
+
+    udpated_languages =
+      Ecto.Changeset.get_change(changeset, :languages)
+      |> Enum.map(fn language ->
+        if(Ecto.Changeset.get_field(language, :name) == selected_language) do
+          attributes = Ecto.Changeset.get_field(language, :attributes)
+
+          language
+          |> Ecto.Changeset.put_assoc(
+            :attributes,
+            List.delete_at(attributes, index)
+          )
+        else
+          Ecto.Changeset.change(language)
+        end
+      end)
 
     updated_changeset = Ecto.Changeset.put_assoc(changeset, :languages, udpated_languages)
+
     Ecto.Changeset.get_field(updated_changeset, :languages)
     |> IO.inspect()
   end
 
   def ok() do
-    changeset = Product.changeset(%Product{},%{
-      "languages" => %{
-        "0" => %{"name" => "FR"},
-        "1" => %{"name" => "EN"}
-      },
-      "name" => ""
-    })
+    changeset =
+      Product.changeset(%Product{}, %{
+        "languages" => %{
+          "0" => %{"name" => "FR"},
+          "1" => %{"name" => "EN"}
+        },
+        "name" => ""
+      })
+
     index = 1
     languages = Ecto.Changeset.get_field(changeset, :languages)
-    updated_changeset = Ecto.Changeset.put_assoc(changeset, :languages, List.delete_at(languages, index))
+
+    updated_changeset =
+      Ecto.Changeset.put_assoc(changeset, :languages, List.delete_at(languages, index))
+
     Ecto.Changeset.get_field(updated_changeset, :languages)
     |> IO.inspect()
   end

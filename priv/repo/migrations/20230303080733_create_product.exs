@@ -3,7 +3,7 @@ defmodule NestedInputsFor.Repo.Migrations.CreateProduct do
 
   def change do
     create table("products") do
-      add :name,    :string, size: 40
+      add :name, :string, size: 40
       timestamps()
     end
   end
